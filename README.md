@@ -1,15 +1,49 @@
+Here’s a simple e-commerce website using Next.js and Tailwind CSS with a homepage and a products page.
+
+1. Setup Project
+
+Run the following commands:
+
+npx create-next-app@latest myshop
+cd myshop
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+Configure tailwind.config.js:
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+Add Tailwind to styles/globals.css:
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+2. Create Components
+
+Navbar
+
+Create components/Navbar.js:
+
 import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="bg-gray-900 text-white p-4">
+    <nav className="bg-blue-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/">
-          <h1 className="text-2xl font-bold cursor-pointer">MyShop</h1>
+          <h1 className="text-2xl font-bold">MyShop</h1>
         </Link>
         <ul className="flex space-x-4">
+          <li><Link href="/">Home</Link></li>
           <li><Link href="/products">Products</Link></li>
-          <li><Link href="/cart">Cart</Link></li>
         </ul>
       </div>
     </nav>
@@ -17,107 +51,79 @@ const Navbar = () => {
 };
 
 export default Navbar;
-import Image from "next/image";
+
+Product Card
+
+Create components/ProductCard.js:
 
 const ProductCard = ({ product }) => {
   return (
-    <div className="border p-4 rounded-lg shadow-lg">
-      <Image src={product.image} alt={product.name} width={200} height={200} />
-      <h2 className="text-lg font-bold mt-2">{product.name}</h2>
+    <div className="border p-4 rounded-lg shadow-md">
+      <h2 className="text-lg font-bold">{product.name}</h2>
       <p className="text-gray-600">${product.price}</p>
-      <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">Add to Cart</button>
+      <button className="bg-green-500 text-white px-4 py-2 mt-2 rounded">
+        Buy Now
+      </button>
     </div>
   );
 };
 
 export default ProductCard;
+
+3. Create Pages
+
+Homepage
+
+Modify pages/index.js:
+
+import Navbar from "../components/Navbar";
+
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold">Welcome to MyShop</h1>
+        <p className="text-gray-600">Your one-stop shop for amazing products!</p>
+      </div>
+    </>
+  );
+}
+
+Products Page
+
+Create pages/products.js:
+
+import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 
 const products = [
-  { id: 1, name: "Product 1", price: 29.99, image: "/product1.jpg" },
-  { id: 2, name: "Product 2", price: 49.99, image: "/product2.jpg" },
+  { id: 1, name: "Product 1", price: 20 },
+  { id: 2, name: "Product 2", price: 35 },
 ];
 
 export default function Products() {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Products</h1>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
-    </div>
-  );
-}
-import { createContext, useState, useContext } from "react";
-
-const CartContext = createContext();
-
-export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
-
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  return (
-    <CartContext.Provider value={{ cart, addToCart }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
-
-export const useCart = () => useContext(CartContext);
-import "../styles/globals.css";
-import { CartProvider } from "../context/CartContext";
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <CartProvider>
-      <Component {...pageProps} />
-    </CartProvider>
-  );
-}
-
-export default MyApp;
-import { useCart } from "../context/CartContext";
-
-export default function Cart() {
-  const { cart } = useCart();
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold">Shopping Cart</h1>
-      {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <ul>
-          {cart.map((item, index) => (
-            <li key={index} className="border-b p-2">
-              {item.name} - ${item.price}
-            </li>
+    <>
+      <Navbar />
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold">Products</h1>
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
-        </ul>
-      )}
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
-import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("your-public-stripe-key");
+4. Run the Website
 
-const CheckoutButton = () => {
-  const handleCheckout = async () => {
-    const stripe = await stripePromise;
-    stripe.redirectToCheckout({ sessionId: "your-session-id" });
-  };
+Start the development server:
 
-  return (
-    <button onClick={handleCheckout} className="bg-green-500 text-white px-4 py-2 rounded">
-      Checkout
-    </button>
-  );
-};
+npm run dev
 
-export default CheckoutButton;
+Now visit http://localhost:3000 to see your simple e-commerce website!
+
+Would you like any extra features?
